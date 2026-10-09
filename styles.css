@@ -81,7 +81,7 @@ p {
 }
 
 #cover-image {
-    width: 500;
+    width: 500px;
     height: 300px;
     border-radius: 10px;
     object-fit: cover;
@@ -137,6 +137,7 @@ section {
 .image-pair {
     align-items: center;
     margin: 40px 0;
+    max-width: 70ch;
 }
 
 .image-row {
