@@ -74,9 +74,15 @@ figcaption {
     margin-top: 5px;
 }
 
+p {
+    line-height: 1.6;
+    max-width: 70ch;
+    word-spacing: 0.05em;
+}
+
 #cover-image {
-    width: 600px;
-    height: 400px;
+    width: 500;
+    height: 300px;
     border-radius: 10px;
     object-fit: cover;
 }
@@ -92,6 +98,63 @@ figcaption {
 }
 
 #about-text {
-    color: (rgb(73, 73, 73));
+    color: rgb(73, 73, 73);
     
+}
+
+section {
+    margin-top: 40px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 24px;
+    color: var(--secondary);
+}
+
+.materials {
+    display: block;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+.project-image {
+    width: 100%;
+    max-width: 600px;
+    border-radius: var(--radius-card);
+}
+
+.project-video {
+    display: block;
+    width: 80%;
+    max-width: 600px;
+    height: auto;
+    aspect-ratio: 718 / 880;
+    margin: 50px auto 0;
+    border-radius: var(--radius-card);
+}
+
+.image-pair {
+    align-items: center;
+    margin: 40px 0;
+}
+
+.image-row {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.image-row img {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-card);
+}
+
+@media (max-width: 600px) {
+    .image-row {
+        flex-direction: column;
+    }
 }
