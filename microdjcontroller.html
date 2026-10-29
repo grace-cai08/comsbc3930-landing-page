@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>micro(dj)controller | Grace Cai</title>
+  <meta name="description" content="Documentation for Module 2">
+  <link rel="icon" href="https://img.icons8.com/?size=100&id=57696&format=png&color=000000">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <main>
+    <a href="index.html" class="back-link">← Back to home</a>
+
+    <header>
+      <h1>Module 2: <br> <span class="h1-emphasis"> micro(dj)controller</span></h1>
+    </header>
+
+    <video class="project-video" width="1920" height="1080" controls>
+        <source src="media/m2/preview-video.mp4" type="video/mp4">
+    </video>
+
+    <section>
+      <h3>Artistic Vision</h3>
+      <p>For this project, all we were asked to do was create something with the hardware components we were given:
+        two buttons, a joystick, a potentiometer, and an LED light. Learning about how the potentiometer worked in class
+        really made me understand how DJ controllers worked, which are comprised mostly of potentiometers. Having just
+        started DJing again regularly at my radio show, I wanted to see if I could create an extremely basic sound
+        manipulation tool that resembles a DJ controller, but abstracts away from it as well.
+      </p>
+      <p>
+        micro(dj)controller, a play on the term 'microcontroller', is inspired by pocket-sized music technology, such as 
+        the Hercules Starlight controller, the SYNTH-A-SETTE analog synthesizer, and the iPod mini. All of these devices 
+        encourage playful acoustic experimentation and prioritize accessibility for beginners. With this project I wanted 
+        to understand what functions matter the most in sound manipulation (in a DJing context), and implement that with 
+        the basic components I had available so that users have as much creative freedom as possible with how they decide 
+        to use the device.
+      </p>
+      <div class="image-row ref-row">
+        <img src="media/m2/inspiration-refs/hercules.png" alt="A very small DJ deck">
+        <img src="media/m2/inspiration-refs/synthasette.png" alt="A pinao-looking device">
+        <img src="media/m2/inspiration-refs/ipodnano.png">
+      </div>
+      <p>
+        img sources (left to right): Hercules, MoMA Design Store, Retrospekt
+      </p>
+
+    </section>
+
+    <section>
+      <h3>Materials</h3>
+      <ul class="materials">
+        <li>ESP32</li>
+        <li>Breadboard</li>
+        <li>Button x2</li>
+        <li>Potentiometer</li>
+        <li>Joystick</li>
+        <li>LED</li>
+        <li>220Ω resistor</li>
+        <li>5 female/male wires</li>
+        <li>jumper wires</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Process</h3>
+      <p>
+        The earliest and most important design decision I made was which functions I wanted each component to serve. This prompted questions such as what makes a DJ controller a DJ controller, what aspects of sound can be manipulated to make the result sound totally different, and what alterations users would find fun, interesting, and intuitive. Ultimately, I decided on the following system:
+      </p>
+      <figure>
+        <img class="m2-notebook-scan" src="media/m2/outline1.jpg">
+        <figcaption>List of all components and their corresponding ESP32 inputs, along with whether they are digital (d) or analog (a), and diagram of planned breadboard layout and each component's function.</figcaption>
+      </figure>
+      <p>
+        This is the wiring system that felt the most intuitive to me, as this project grew out of the initial idea that all DJ controllers are just many potentiometers with different functions placed on the same deck. Because of this, I decided very early on that the potentiometer would be used for applying a color FX filter. I then decided to assign tempo control and scrubbing functions to the x and y inputs of the joystick, respectively. Initially I had planned to assign tempo control to the y values of the joystick but because I manually attached the joystick to the breadboard using tac at a 90 degree rotation (so tilting it vertically was actually changing the x values, and tilting it horizontally was changing the y values) so that the wires would not overlap with other components of the board (which I had already set down), I had to change the tempo control to be dependent on the x values. Tempo control, scrubbing, and CFX filtering all require a gradual motion of figuring what ‘level’ of change you want to apply, such as how exactly muffled or sharp you want a track to sound when applying a CFX filter, so all of these functions were assigned to analog inputs. The remaining 2 buttons were assigned to playing/pausing a track and creating loops, which don’t require gradual control across a given spectrum. Finally, I needed to utilize the button of the joystick in order to toggle between track selection and mixing mode, as I really wanted to give users the opportunity to try out the functions with a variety of tracks.
+      </p>
+       <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/outline2.jpeg" alt="Notebook with writing on it">
+          <img src="media/m2/outline3.jpeg" alt="Notebook with display sketch on it">
+        </div>
+        <figcaption>List of anticipated functions and their relevant Minim example code + notes from coding and debugging</figcaption>
+      </figure>
+      <p>
+        Creating the software for this system was a process of assembling pieces of a jigsaw puzzle that were already available to me. I decided early on to use the Minim audio library, which provides many useful classes and methods for sound-related projects made in Processing. Minim already contains many examples relevant to my project, so most of my sketch consists of already-existing Minim library examples adapted to fit my inputs and my system. From here, I had to identify functions from the Minim library that would be most useful to me, which consisted of skimming the Minim documentation and rapidly testing out example code from the library with my laptop's mouse and keyboard as controls (as opposed to fully implementing it on my hardware components). For each hardware component, I repeated the same process of finding the relevant Minim example code, testing out the example code, adjusting arguments and parameters to match my input, and connecting it to other parts of the system.
+      </p>
+    </section>
+
+    <section>
+      <h3>Technical Challenges</h3>
+      <p>
+        Adapting the Minim library's example code for functions I intended to use for analog inputs was difficult. I had to use the Arduino serial monitor to understand the full range of values each input was able to send, and change specific parameters in the example code in order to fit the given value range. In other cases, the example code had too many options for customization and was taking too many inputs from either the laptop's native keyboard/mouse, and I needed to find ways to combine these functions into one or decide what to keep and what to leave out. An example of this process is my adaptation of the library's moogFilterExample() function to what would ultimately become my applyCFX(int v) function.
+      </p>
+      <p>
+        When considering the implementation of the CFX filters, there were three example functions/code files that I anticipated were going to be relevant: moogFilterExample, delayExample, and flangerExample. I was able to quickly find these functions as they share names with a lot of traditional DJ software effects and controller button labels. After running all three programs on my laptop with its native inputs, I decided that the moogFilterExample contained the most of what I wanted to implement as my potentiometer input.
+      </p>
+      <p>
+        The first issue was that the example code applied the filter to a white noise object, which was created within the program itself. I needed to replace this with my loaded track, which was ultimately simple as I just needed to patch() the effect onto my main audio stream.
+      </p>
+      <p>
+        The filter is created through altering 2 sound features: frequency and resonance. The example program was able to demonstrate this by the x-y coordinates of the mouse, wherein dragging the mouse upwards and downwards in the window adjusted the sound's resonance, and moving it sideways adjusted the frequency. Both of these adjustments are necessary for the CFX filter, therefore I had to combine them in a way so that they could both be adjusted based on one input value as opposed to two values. Another issue was that the program relied on the user pressing the '1', '2', or '3' keys on the keyboard to switch between the low-pass, high-pass, and band-pass filters. To address this issue I decided to disregard the band-pass filter and apply the low-pass and high-pass filters automatically depending on whether the potentiometer input was above or below the median value. This is what a first pass at adapting the code looked like:
+      </p>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/moogFilterExampleCode.png" alt="Java code in Processing">
+          <img src="media/m2/moogfilterfirstpass.png" alt="Java code in Processing">
+        </div>
+        <figcaption>Left: Minim's moogFilterExample code. Right: Initial code for the CFX filter, adapted from Minim's moogFIlterExample.</figcaption>
+      </figure>
+      <p>
+        For this first iteration, I changed parameters in order to fit my input value range, and maintained the basic structure of the example code. I also decided to add a delay so that as the potentiometer gets closer to 0 an echo effect is added. Since I want the left end (v=0) to sound muffled and emphasize low-frequency noise and for the right end (v=pot_max) to sound sharp and scratchy, I thought it would make sense for the low-pass filter to automatically apply when the pot value was below the midpoint, and for the high-pass filter to do the same but for above the midpoint.
+      </p>
+      <p>
+        There were 2 issues when I tested this out: the switch from LP to HP once the potentiometer was past the midpoint was very jarring and not smooth at all, and there was virtually no difference in the filter's intensity from around the midpoint to the potentiometer's max value. To fix the first issue, I decided to rearrange the function so everything revolves on where the potentiometer is relative to its mid value, and that when the potentiometer is around the mid value, no effect is applied at all. I decided on making this 'deadzone' around 150 based on starting from 50, and then testing out different values to see what sounded the most natural. Finally, I created 3 conditions depending on whether the potentiometer was in the low-pass zone, deadzone, or high-pass zone, and then, based off of the deadzone having a frequency of 2000 and resonance of 0, adjusted the value range for the two filters based on what sounded right.
+      </p>
+      <div id="m2-code-snippet">
+        <figure class="code-snippet">
+          <pre><code>
+          <span class="code-comment">//cfx (adapted from moogFilterExample)</span>
+          void applyCFX(int v) {
+              
+            int noFilterBoundary = 150;                             <span class="code-comment">//at pot_mid +-150 play original sound</span>
+            float freq;
+            float rez;
+            
+            if (v < pot_mid - noFilterBoundary) { 
+              moog.type = MoogFilter.Type.LP;                                 <span class="code-comment">//low-pass condition</span>
+              freq = map(v, 0, (pot_mid - noFilterBoundary), 200, 20000);
+              rez = map(v, 0, (pot_mid - noFilterBoundary), 0.7, 0); 
+            } else if (v > pot_mid + noFilterBoundary) { 
+              moog.type = MoogFilter.Type.HP;                                 <span class="code-comment">//high-pass condition</span>
+              freq = map(v, (pot_mid + noFilterBoundary), pot_max, 20, 4000);
+              rez = map(v, (pot_mid + noFilterBoundary), pot_max, 0, 0.7);
+            } else {
+              moog.type = MoogFilter.Type.LP;                                 <span class="code-comment">//default/normal condition</span>
+              freq = 2000
+              rez = 0;
+            }
+            
+            float del = map(v, 0, pot_max, 0.1, 0);
+            
+            moog.frequency.setLastValue(freq);
+            moog.resonance.setLastValue(rez);
+            delay.delAmp.setLastValue(del);
+            
+          }
+          </code></pre>
+        </figure>
+      </div>
+      <figcaption>Final code for the CFX filter.</figcaption>
+      <p>
+        All other functions adapted from the library's example code followed this process of understanding the example's original inputs, adapting them for my inputs, and adjusting value ranges when applicable based on (lots of) trial and error through rapidly running the sketch and testing out the function via the hardware.
+      </p>
+    </section>
+
+    <section>
+      <h3>AI Usage</h3>
+      <p>
+        For this project I used Claude Opus 5.5 to assist me with creating an initial user interface and layout which I later edited to include my custom font and color palette. This includes functions such as drawProgressBar, drawHeader, and drawTrackList (all functions initially generated by Claude have been grouped together at the bottom of the sketch with a divider labelled “GENERATED BY CLAUDE”). I also used AI assistance to learn how to make the LED light blink and for debugging purposes.
+      </p>
+      <p>
+        Example of prompts used for display: <br>
+        [pasted code adapted from drawWaveForm() example] <br>
+        “Currently I only have this waveform as my UI. I would like to add the following:
+      </p>
+        <ul class="materials">
+          <li>a header box where I can insert the title of this project</li>
+          <li>a progress bar that tells me how far i am into the song (indicate loop points with yellow bars when they have been set)</li>
+          <li>a smaller rectangle box for the current waveform</li>
+          <li>a tracklist on the right side of the screen that displays the available tracks.</li>
+        </ul>
+      <p>
+        For the progress bar, waveform box, and tracklist, give me a thin border and show me where to change the color of the border as well. Do not add a stroke outline to the header box. Gradually leave more of the code you provide me with empty so I can fill it out myself.”
+      </p>
+      
+      <p>
+        Prompt used for LED blink: <br>
+        [pasted arduino code for activating LED light] <br>
+        “I have programmed the ESP32 to make the LED light up when a track is playing. Can you show me how to make the LED detect when a track is looping, and then blink instead of showing static light? Do not change or delete anything I’ve already written.”
+      </p>
+      <p>
+        For debugging, I would explain the issue and paste a portion of code if necessary, and ask if it could point me to where the issue might be caused, for example: <br>
+        “The loop indicator lines are currently running past the top and bottom borders of the progress bar box. What parameters do I need to change for them to stay within the box instead?”
+      </p>
+    </section>
+
+    <p>Link to GitHub repository: <a href="https://github.com/grace-cai08/microdjcontroller">https://github.com/grace-cai08/microdjcontroller</a></p>
+
+    <section>
+      <h3>Additional Media</h3>
+      <p>
+        Below are some gifs and videos demonstrating each hardware component's assigned function. The left side shows the part being used, and the right side shows the corresponding display/sound effect.
+      </p>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/b1-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/b1-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Button 1: playing/pausing a track</figcaption>
+      </figure>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/joystickx-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/joystickx-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Joystick vertical: speeding up/slowing down a track</figcaption>
+      </figure>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/joysticky-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/joysticky-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Joystick horizontal: track scrubbing</figcaption>
+      </figure>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/pot-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/pot-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Potentiometer: CFX filter</figcaption>
+      </figure>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/b2-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/b2-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Button 2: Looping (1st press = set loop start, 2nd = set loop end + start loop, 3rd = exit)</figcaption>
+      </figure>
+      <figure class="image-pair">
+        <div class="image-row">
+          <img src="media/m2/demo-by-component/joystickx2-controller.gif">
+          <video class="ref-video" width="1920" height="1080" controls>
+          <source src="media/m2/demo-by-component/joystickx2-screen.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Joystick button and vertical: browse mode toggle and track selection</figcaption>
+      </figure>
+
+      <p>
+        Sound credits: <br>
+        Daft Punk, Panda Bear - Doin' It Right (feat. Panda Bear) <br>
+        SOPHIE - EEEHHH/Nothing More To Say <br>
+        Underworld - Born Slippy (Nuxx)
+      </p>
+    </section>
+
+  </main>
+</body>
+</html>
